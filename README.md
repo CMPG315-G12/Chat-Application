@@ -22,7 +22,11 @@ A full-featured real-time chat application built with the **MERN stack**, powere
 
 ### 🛠️ Tech Stack
 
-&#x20;    &#x20;
+- ![React](https://img.shields.io/badge/Frontend-React-blue) + ![Electron](https://img.shields.io/badge/Desktop-Electron-9cf)
+- ![Node.js](https://img.shields.io/badge/Backend-Node.js-green) + ![Express](https://img.shields.io/badge/Server-Express.js-lightgrey)
+- ![MongoDB](https://img.shields.io/badge/Database-MongoDB-brightgreen)
+- ![Socket.io](https://img.shields.io/badge/Realtime-Socket.io-black)
+- ![JWT](https://img.shields.io/badge/Auth-JWT-orange)
 
 ### 📦 Getting Started
 
