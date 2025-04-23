@@ -1,10 +1,11 @@
 ### 🛠️ Tech Stack
 
-- ![React](https://img.shields.io/badge/Frontend-React-blue) + ![Electron](https://img.shields.io/badge/Desktop-Electron-9cf)
-- ![Node.js](https://img.shields.io/badge/Backend-Node.js-green) + ![Express](https://img.shields.io/badge/Server-Express.js-lightgrey)
-- ![MongoDB](https://img.shields.io/badge/Database-MongoDB-brightgreen)
-- ![Socket.io](https://img.shields.io/badge/Realtime-Socket.io-black)
-- ![JWT](https://img.shields.io/badge/Auth-JWT-orange)
+- ![React](https://img.shields.io/badge/Frontend-React-blue?logo=react) + ![Tailwind](https://img.shields.io/badge/Styling-Tailwind-cyan?logo=tailwindcss) +![Electron](https://img.shields.io/badge/Desktop-Electron-9cf?logo=electron) 
+- ![Node.js](https://img.shields.io/badge/Backend-Node.js-green?logo=nodedotjs) + ![Express](https://img.shields.io/badge/Server-Express.js-lightgrey?logo=express)
+- ![MongoDB](https://img.shields.io/badge/Database-MongoDB-brightgreen?logo=mongodb)
+- ![Socket.io](https://img.shields.io/badge/Realtime-Socket.io-black?logo=socketdotio)
+- ![JWT](https://img.shields.io/badge/Auth-JWT-orange?logo=jsonwebtokens) + ![Oauth](https://img.shields.io/badge/TBD-auth0-purple?logo=auth0
+)
 
 ## 📱 Real-Time Chat App
 
