@@ -1,11 +1,10 @@
-## ENV
-Please ensure you add a .env to the root of the server file
-must include:
+### 🛠️ Tech Stack
 
-MONGODB_URI= <Your URI - Get from mongodb atlas>
-PORT= 5001
-JWT_SECRET="CMPG315"
-NODE_ENV= "development"
+- ![React](https://img.shields.io/badge/Frontend-React-blue) + ![Electron](https://img.shields.io/badge/Desktop-Electron-9cf)
+- ![Node.js](https://img.shields.io/badge/Backend-Node.js-green) + ![Express](https://img.shields.io/badge/Server-Express.js-lightgrey)
+- ![MongoDB](https://img.shields.io/badge/Database-MongoDB-brightgreen)
+- ![Socket.io](https://img.shields.io/badge/Realtime-Socket.io-black)
+- ![JWT](https://img.shields.io/badge/Auth-JWT-orange)
 
 ## 📱 Real-Time Chat App
 
@@ -20,14 +19,6 @@ A full-featured real-time chat application built with the **MERN stack**, powere
 - 🗂️ Organized conversations with support for multiple chat rooms or DMs
 - 🌐 Built with MongoDB, Express.js, React, and Node.js
 
-### 🛠️ Tech Stack
-
-- ![React](https://img.shields.io/badge/Frontend-React-blue) + ![Electron](https://img.shields.io/badge/Desktop-Electron-9cf)
-- ![Node.js](https://img.shields.io/badge/Backend-Node.js-green) + ![Express](https://img.shields.io/badge/Server-Express.js-lightgrey)
-- ![MongoDB](https://img.shields.io/badge/Database-MongoDB-brightgreen)
-- ![Socket.io](https://img.shields.io/badge/Realtime-Socket.io-black)
-- ![JWT](https://img.shields.io/badge/Auth-JWT-orange)
-
 ### 📦 Getting Started
 
 Clone the repository and follow the setup instructions in the `/client` and `/server` directories to run the app locally.
@@ -39,3 +30,11 @@ cd Chat-Application
 
 📄 Check out the full documentation in the [README](./README.md) for installation steps, environment setup, and more.
 
+## ENV
+Please ensure you add a .env to the root of the server file
+must include:
+
+MONGODB_URI= <Your URI - Get from mongodb atlas>
+PORT= 5001
+JWT_SECRET="CMPG315"
+NODE_ENV= "development"
