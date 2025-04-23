@@ -19,14 +19,14 @@ export const getUsersForContactList = async (req, res) => {
 //Recipient is the destiantions of the messages - 1:1 = recipiant userId
 export const getMessages = async (req, res) => {
     try {
-        const { id: recipiant } = req.params;
+        const { id: recipient } = req.params;
         const userId = req.user._id;
 
         //Get all messages sent and recived between the two users 
         const messages = await Message.find({
             $or: [
-                { senderId: userId, recipientId: recipiant },
-                { senderId: recipiant, recipientId: userId }
+                { senderId: userId, recipientId: recipient },
+                { senderId: recipient, recipientId: userId }
             ]
         })
 
@@ -40,7 +40,7 @@ export const getMessages = async (req, res) => {
 export const sendMessage = async (req, res) => {
     try {
         const { text, image } = req.body;
-        const { id: recipiantId } = req.params;
+        const { id: recipientId } = req.params;
         const senderId = req.user._id;
 
         //TODO: Image Sending
@@ -51,7 +51,7 @@ export const sendMessage = async (req, res) => {
 
         const newMessage = new Message({
             senderId: senderId,
-            recipientId, recipiantId,
+            recipientId, recipientId,
             text: text,
             //image: <insert ref to image>
         })
