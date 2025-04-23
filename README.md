@@ -22,11 +22,38 @@ A full-featured real-time chat application built with the **MERN stack**, powere
 
 ### 📦 Getting Started
 
-Clone the repository and follow the setup instructions in the `/client` and `/server` directories to run the app locally.
-
+Clone the repository
 ```bash
 git clone https://github.com/CMPG315-G12/Chat-Application.git
 cd Chat-Application
+```
+
+Install Required Dependencies
+```bash
+npm i
+```
+
+If there are issues
+```bash
+npm audit fix
+```
+
+#### Start Server
+
+Run the server in developement mode - there are a few packages that are there to assist in Development.
+
+```bash
+cd server
+npm run dev
+```
+
+#### Run Client
+
+Start the Client - Server must be running aswell
+
+```bash
+cd client
+npm run dev
 ```
 
 📄 Check out the full documentation in the [README](./README.md) for installation steps, environment setup, and more.
@@ -39,3 +66,6 @@ MONGODB_URI= <Your URI - Get from mongodb atlas>
 PORT= 5001
 JWT_SECRET="CMPG315"
 NODE_ENV= "development"
+
+
+
