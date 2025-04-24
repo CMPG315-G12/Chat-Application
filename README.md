@@ -62,10 +62,38 @@ npm run dev
 Please ensure you add a .env to the root of the server file
 must include:
 
-MONGODB_URI= <Your URI - Get from mongodb atlas>
+### --- Database Connection URI ---
+MONGODB_URI= <your_mongodb_connection_string_here>
 PORT= 5001
 JWT_SECRET="CMPG315"
+
+### --- Environment ---
 NODE_ENV= "development"
+
+### -- 
+CLIENT_URL= <Your Client URL>
+SERVER_URL= <Your Server URL>
+
+### --- Google OAuth Credentials ---
+GOOGLE_CLIENT_ID=<your_google_client_id>
+GOOGLE_CLIENT_SECRET=<your_google_client_secret>
+#### Ensure this matches the callback route in auth.routes.js and Google Console settings
+GOOGLE_CALLBACK_URL=<Callback URL>
+
+### --- Discord OAuth Credentials ---
+DISCORD_CLIENT_ID=<your_discord_client_id>
+DISCORD_CLIENT_SECRET=<your_discord_client_secret>
+#### Ensure this matches the callback route in auth.routes.js and Discord Developer Portal settings 
+DISCORD_CALLBACK_URL=<Callback URL>
+
+### --- GitHub OAuth Credentials ---
+GITHUB_CLIENT_ID=<your_github_client_id>
+GITHUB_CLIENT_SECRET=<your_github_client_secret>
+#### Ensure this matches the callback route in auth.routes.js and GitHub OAuth App settings
+GITHUB_CALLBACK_URL=<Callback URL>
+
+### --- Cookie Settings (Optional - defaults are often fine) ---
+COOKIE_MAX_AGE_MS=604800000 # Example: 7 days (7 * 24 * 60 * 60 * 1000) - Matches your utils.js
 
 
 

@@ -111,3 +111,27 @@ export const checkAuth = async (req, res) => {
         res.status(500).json({ message: "Internal Server Error"});        
     }
 }
+
+//Generic OAuth Callback Handler 
+export const handleOAuthCallback = (req, res) => {
+    // Passport attaches the user object to req.user after successful authentication via the 'done(null, user)' call in your passport strategy config.
+    if (!req.user) {
+        console.error("OAuth callback missing user object");
+        return res.status(500).json({ message: "Internal Server Error"});
+    }
+
+    try {
+        // Log success, including provider info if available on req.user
+        console.log(`OAuth successful for ${req.user.provider || 'provider'}, user:`, req.user.email);
+
+        // Generate JWT and set cookie using your existing utility
+        generateToken(req.user._id, res);
+
+        // Redirect to your frontend dashboard or desired page
+        res.redirect(`${CLIENT_URL}/dashboard`);
+
+    } catch (err) {
+        console.error("Error generating token or redirecting after OAuth:", err);
+        return res.status(500).json({ message: "Internal Server Error"});
+    }
+};
