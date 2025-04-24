@@ -63,7 +63,7 @@ Please ensure you add a .env to the root of the server file
 must include:
 
 ### --- Database Connection URI ---
-MONGODB_URI= <your_mongodb_connection_string_here>
+MONGODB_URI= your_mongodb_connection_string_here
 PORT= 5001
 JWT_SECRET="CMPG315"
 
@@ -71,26 +71,26 @@ JWT_SECRET="CMPG315"
 NODE_ENV= "development"
 
 ### -- 
-CLIENT_URL= <Your Client URL>
-SERVER_URL= <Your Server URL>
+CLIENT_URL=  Your Client URL || localhost:5173
+SERVER_URL=  Your Server URL || localhost:5001
 
 ### --- Google OAuth Credentials ---
-GOOGLE_CLIENT_ID=<your_google_client_id>
-GOOGLE_CLIENT_SECRET=<your_google_client_secret>
+GOOGLE_CLIENT_ID= your_google_client_id
+GOOGLE_CLIENT_SECRET= your_google_client_secret
 #### Ensure this matches the callback route in auth.routes.js and Google Console settings
-GOOGLE_CALLBACK_URL=<Callback URL>
+GOOGLE_CALLBACK_URL= Callback URL
 
 ### --- Discord OAuth Credentials ---
-DISCORD_CLIENT_ID=<your_discord_client_id>
-DISCORD_CLIENT_SECRET=<your_discord_client_secret>
+DISCORD_CLIENT_ID= your_discord_client_id
+DISCORD_CLIENT_SECRET= your_discord_client_secret
 #### Ensure this matches the callback route in auth.routes.js and Discord Developer Portal settings 
-DISCORD_CALLBACK_URL=<Callback URL>
+DISCORD_CALLBACK_URL= Callback URL
 
 ### --- GitHub OAuth Credentials ---
-GITHUB_CLIENT_ID=<your_github_client_id>
-GITHUB_CLIENT_SECRET=<your_github_client_secret>
+GITHUB_CLIENT_ID= your_github_client_id
+GITHUB_CLIENT_SECRET= your_github_client_secret
 #### Ensure this matches the callback route in auth.routes.js and GitHub OAuth App settings
-GITHUB_CALLBACK_URL=<Callback URL>
+GITHUB_CALLBACK_URL= Callback URL
 
 ### --- Cookie Settings (Optional - defaults are often fine) ---
 COOKIE_MAX_AGE_MS=604800000 # Example: 7 days (7 * 24 * 60 * 60 * 1000) - Matches your utils.js
