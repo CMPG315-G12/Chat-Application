@@ -53,8 +53,10 @@ Start the Client - Server must be running aswell
 
 ```bash
 cd client
-npm run dev
+npm start
 ```
+
+Hot reload is enabled so you can just keep the client running as you make changes to the app.
 
 📄 Check out the full documentation in the [README](./README.md) for installation steps, environment setup, and more.
 
