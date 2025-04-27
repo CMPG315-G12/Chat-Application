@@ -18,7 +18,10 @@ const PORT = process.env.PORT;
 // --Middleware --
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors());
+app.use(cors({
+    origin: '*', // Adjust based on your security requirements
+    credentials: true
+}));
 app.use(cookieParser()); // JWT cookie parsing
 app.use(passport.initialize());
 
@@ -28,5 +31,10 @@ connectDB();
 // -- Routes --
 app.use("/api/auth", authRoutes);
 app.use("/api/message", messageRoutes);
+
+// Test - Your API endpoints here
+app.get('/api/data', (req, res) => {
+    res.json({ message: 'Hello from server!' });
+});
 
 app.listen(PORT, () => console.log(`server running on port ${PORT}`)); 
