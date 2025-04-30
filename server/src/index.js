@@ -18,10 +18,14 @@ const PORT = process.env.PORT;
 // --Middleware --
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors({
-    origin: '*', // Adjust based on your security requirements
-    credentials: true
-}));
+app.use(
+    cors({
+        origin: process.env.CLIENT_URL || "http://localhost:3000", // Allow requests from your frontend
+        methods: ["GET", "POST", "PUT", "DELETE"], // Specify allowed HTTP methods
+        credentials: true, // Allow cookies and credentials
+        allowedHeaders: ["Content-Type", "Authorization"], // Specify allowed headers
+    })
+);
 app.use(cookieParser()); // JWT cookie parsing
 app.use(passport.initialize());
 

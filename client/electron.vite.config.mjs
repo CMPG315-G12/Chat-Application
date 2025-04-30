@@ -2,6 +2,7 @@ import { defineConfig, externalizeDepsPlugin } from 'electron-vite';
 import { resolve } from 'path';
 import { loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
+import tailwindcss from '@tailwindcss/vite'
 
 
 export default defineConfig(({ command, mode }) => {
@@ -74,7 +75,10 @@ export default defineConfig(({ command, mode }) => {
           '@renderer': resolve('src/renderer/src')
         }
       },
-      plugins: [react()],
+      plugins: [react(), tailwindcss()],
+      server: {
+        historyApiFallback: true, // Ensures React Router works with Electron
+      },
       csp: {
         'default-src': ["'self'"],
         'script-src': [
@@ -99,8 +103,8 @@ export default defineConfig(({ command, mode }) => {
         'manifest-src': ["'self'"],
         'connect-src': [
           "'self'",
-          // env.VITE_API_URL.replace(/\/$/, '')
-          "http://localhost:5001"
+          env.VITE_API_URL.replace(/\/$/, '')
+
         ]
       }
     }

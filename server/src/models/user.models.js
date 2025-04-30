@@ -14,18 +14,24 @@ const userSchema = new mongoose.Schema(
         },
         password: {
             type: String,
-            required: function () { return !this.provider; },
+            required: function () {
+                return !this.providers || this.providers.length === 0;
+            },
             minlength: 8,
         },
-        provider: { //Google, Github, Discord
-            type: String,
-            enum: ["google", "discord", "github", null], //Allow null incase they use email
-            default: null
-        },
-        providerId: { //Unique ID from OAuth provider
-            type: String,
-            sparse: true, //Allows for nulls but unique otherwise
-        },
+        providers: [
+            {
+                provider: {
+                    type: String,
+                    enum: ["google", "discord", "github"],
+                    required: true,
+                },
+                providerId: {
+                    type: String,
+                    required: true,
+                },
+            },
+        ],
         displayName: {
             type: String,
         },
@@ -33,12 +39,23 @@ const userSchema = new mongoose.Schema(
             type: Schema.Types.ObjectId,
             ref: "User",
         }],
+        profilePic: {
+            type: String,
+            default: function () {
+                const randomIndex = Math.floor(Math.random() * 5);
+                `https://cdn.discordapp.com/embed/avatars/${randomIndex}.png`
+            },
+        },
+
     },
     { timestamps: true },
 );
 
-//Adds compound index to allow for quick lookup of OAuth users
-userSchema.index({ provider: 1, providerId: 1 }, { unique: true, sparse: true });
+// Add a compound index to ensure unique provider-providerId pairs
+userSchema.index(
+    { "providers.provider": 1, "providers.providerId": 1 },
+    { unique: true, sparse: true }
+);
 
 const User = mongoose.model("User", userSchema);
 

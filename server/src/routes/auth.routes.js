@@ -17,7 +17,7 @@ router.post("/signup", signup);
 router.post("/login", login);
 router.post("/logout", logout);
 router.put("/update/profile", protectRoute, updateProfile);
-router.get("/check", protectRoute, checkAuth);
+router.get("/checkAuth", protectRoute, checkAuth);
 
 // --- Google Auth Routes ---
 router.get('/google',
@@ -27,9 +27,14 @@ router.get('/google',
 router.get('/google/callback',
     // Authenticate via Passport first
     passport.authenticate('google', {
-        failureRedirect: `${CLIENT_URL}/login-failed?provider=google`,
+        failureRedirect: `${process.env.CLIENT_URL}/login-failed?provider=google`,
         session: false // Ensure session is false for JWT
     }),
+    (req, res, next) => {
+        console.log("Google OAuth Callback Hit");
+        console.log("Authenticated User:", req.user); // Log the user object
+        next();
+    },
     // If authentication succeeds, call the controller function
     handleOAuthCallback
 );
@@ -41,10 +46,10 @@ router.get('/discord',
 
 router.get('/discord/callback',
     passport.authenticate('discord', {
-        failureRedirect: `${CLIENT_URL}/login-failed?provider=discord`,
+        failureRedirect: `${process.env.CLIENT_URL}/login-failed?provider=discord`,
         session: false
     }),
-    handleOAuthCallback // Use the controller function
+    handleOAuthCallback // Processes OAuth tokens and creates or updates user sessions
 );
 
 // --- GitHub Auth Routes ---
@@ -54,7 +59,7 @@ router.get('/github',
 
 router.get('/github/callback',
     passport.authenticate('github', {
-        failureRedirect: `${CLIENT_URL}/login-failed?provider=github`,
+        failureRedirect: `${process.env.CLIENT_URL}/login-failed?provider=github`,
         session: false
     }),
     handleOAuthCallback // Use the controller function

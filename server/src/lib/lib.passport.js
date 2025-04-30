@@ -14,69 +14,57 @@ const findOrCreateUser = async (profile, provider, done) => {
 
     let email = null;
     if (provider === 'google' && profile.emails && profile.emails[0]) {
-        email = provider.emails[0].value;
+        email = profile.emails[0].value;
     } else if (provider === 'discord' && profile.email) {
         email = profile.email;
     } else if (provider === 'github' && profile.emails && profile.emails.length > 0) {
-        email = profile.find(e => e.primary)?.value || profile.emails[0].value;
+        email = profile.emails.find(e => e.primary)?.value || profile.emails[0].value;
     }
 
     if (!email) {
         console.warn(`Email not provided by ${provider} for profile ID: ${profile.id}`);
 
-        return done(new Error(`Email not provided by ${provider}. Cannot create or link user.`), null);
+       throw new Error(`Email not provided by ${provider}. Cannot create or link user.`);
     }
-
-    const userData = {
-        providerId: profile.id,
-        provider: provider,
-        displayName: profile.displayName || profile.username || profile.global_name || `User_${profile.id.substring(0, 8)}`,
-        email: email.toLowerCase(), // Store emails consistently
-        fullName: profile.displayName || profile.username || email.split('@')[0], // TODO: Provide a sensible default
-        profilePic: (profile.photos && profile.photos[0]?.value) ||
-            (provider === 'discord' && profile.avatar ? `https://cdn.discordapp.com/avatars/${profile.id}/${profile.avatar}.png` : '') ||
-            '',
-    };
 
     try {
         //find user by provider id
-        const user = await User.findOne({ provider: provider, providerId: providerId });
+        let user = await User.findOne({ email });
 
         //User found by providerId
         if (user) {
-            return (null, user);
-        }
+            // Check if the provider is already linked
+            const existingProvider = user.providers.find(
+                (p) => p.provider === provider && p.providerId === profile.id
+            );
 
-        user = await User.findOne({ email: userData.email });
-
-        //User with email exists       
-        if (user) {
-            if (!user.provider) {
-                console.log(`Linking ${provider} to existing email user: ${user.email}`);
-
-                user.provider = provider;
-                user.providerId = providerId;
-
-                //TODO: Change Image?
-
+            if (!existingProvider) {
+                // Add the new provider to the providers array
+                user.providers.push({ provider, providerId: profile.id });
                 await user.save();
-                return done(null, user);
-            } else {
-                // User exists but with a *different* provider or already linked.
-                // TODO: Expand collition handling
-
-                console.error(`User with email ${userData.email} already exists with provider ${user.provider}.`);
-                return done(new Error(`Account conflict: Email ${userData.email} is already associated with another login method.`), null);
+                console.log(`Linked ${provider} to existing user: ${email}`);
             }
-        } else {
-            // No user found by provider ID or email - Create new user
-            console.log(`Creating new ${provider} user: ${userData.email}`);
-            user = await User.create(userData);
-            return done(null, user);
+
+            return user;
+        } else { 
+            // No user found by provider ID - Create new user
+            console.log(`Creating new ${provider} user: ${email}`);
+            user = await User.create({
+                email: email.toLowerCase(),
+                fullName: profile.displayName || profile.username || email.split('@')[0],
+                displayName: profile.displayName || profile.username || email.split('@')[0],
+                providers: [{ provider, providerId: profile.id }],
+                profilePic: (profile.photos && profile.photos[0]?.value) ||
+                    (provider === 'discord' && profile.avatar ? `https://cdn.discordapp.com/avatars/${profile.id}/${profile.avatar}.png` : '') ||
+                    '',
+            });
+            
+            return user;
         }
+
     } catch (err) {
         console.error(`Error in findOrCreateUser for ${provider}:`, err);
-        return done(err, null);
+       throw err; // Let the error propagate to the Passport callback
     }
 };
 
@@ -87,9 +75,21 @@ passport.use(new GoogleStrategy({
     callbackURL: process.env.GOOGLE_CALLBACK_URL,
     scope: ['profile', 'email']
 },
-    (accessToken, refreshToken, profile, done) => {
-        findOrCreateUser(profile, 'google', done);
-    }));
+    async (accessToken, refreshToken, profile, done) => {
+        console.log("Google Strategy Callback Invoked");
+        console.log("Google Profile:", profile);
+
+        try {
+            // Simulate finding or creating a user
+            const user = await findOrCreateUser(profile, 'google');
+            done(null, user);
+        } catch (err) {
+            console.error("Error in Google Strategy:", err);
+            done(err, null); // Call done with an error
+        }
+    }
+
+));
 
 // --- Discord Strategy ---
 passport.use(new DiscordStrategy({
@@ -98,9 +98,23 @@ passport.use(new DiscordStrategy({
     callbackURL: process.env.DISCORD_CALLBACK_URL,
     scope: ['identify', 'email']
 },
-    (accessToken, refreshToken, profile, done) => {
-        findOrCreateUser(profile, 'discord', done);
-    }));
+    async (accessToken, refreshToken, profile, done) => {
+        console.log("Discord Strategy Callback Invoked");
+        console.log("Discord Profile:", profile);
+
+        try {
+            // Simulate finding or creating a user
+            const user = await findOrCreateUser(profile, 'discord');
+            console.log("User Found or Created:", user);
+
+            // Call done with the user object
+            done(null, user);
+        } catch (err) {
+            console.error("Error in Discord Strategy:", err);
+            done(err, null); // Pass the error to Passport
+        }
+    }
+));
 
 // --- GitHub Strategy ---
 passport.use(new GitHubStrategy({
@@ -109,8 +123,22 @@ passport.use(new GitHubStrategy({
     callbackURL: process.env.GITHUB_CALLBACK_URL,
     scope: ['user:email']
 },
-    (accessToken, refreshToken, profile, done) => {
-        findOrCreateUser(profile, 'github', done);
-    }));
+    async (accessToken, refreshToken, profile, done) => {
+        console.log("GitHub Strategy Callback Invoked");
+        console.log("GitHub Profile:", profile);
+
+        try {
+            // Simulate finding or creating a user
+            const user = await findOrCreateUser(profile, 'github');
+            console.log("User Found or Created:", user);
+
+            // Call done with the user object
+            done(null, user);
+        } catch (err) {
+            console.error("Error in GitHub Strategy:", err);
+            done(err, null); // Pass the error to Passport
+        }
+    }
+));
 
 export default passport;
