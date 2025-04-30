@@ -28,15 +28,18 @@ export const signup = async (req, res) => {
         })
 
         if (newUser) {
-            generateToken(newUser._id, res);
+            const token = generateToken(newUser._id, res);
             await newUser.save();
 
+            res.cookie("JWT", token, { httpOnly: true, });
             res.status(201).json({
                 _id: newUser._id,
                 fullName: newUser.fullName,
                 email: newUser.email,
                 profilePic: newUser.profilePic,
-            });
+                redirectUrl: `${process.env.CLIENT_URL}/`
+            }); // Adjust the redirect URL as needed
+            
         } else {
             res.status(400).json({ message: "Invalid User Data" });
         }
@@ -59,14 +62,15 @@ export const login = async (req, res) => {
 
         if (!isPassCorrect) { return res.status(400).json({ message: "Invaild Credentials" }) };
 
-        generateToken(user._id, res);
-
+        const token = generateToken(user._id, res);
+        res.cookie("JWT", token, { httpOnly: true, });
         res.status(200).json({
             _id: user._id,
             fullName: user.fullName,
             email: user.email,
             profilePic: user.profilePic,
-        });
+            redirectUrl: `${process.env.CLIENT_URL}/`
+        }); // Adjust the redirect URL as needed
 
     } catch (err) {
         console.log("Error in Login Controller: ", err);
@@ -105,19 +109,20 @@ export const updateProfile = async (req, res) => {
 
 export const checkAuth = async (req, res) => {
     try {
-        res.status(200).json(req.user);
+        res.status(200).json({ user: req.user });
     } catch (err) {
         console.log("Error in checkAuth controller", err.message);
-        res.status(500).json({ message: "Internal Server Error"});        
+        res.status(500).json({ message: "Internal Server Error" });
     }
 }
 
 //Generic OAuth Callback Handler 
 export const handleOAuthCallback = (req, res) => {
+    console.log("OAuth Callback Handler Invoked");
     // Passport attaches the user object to req.user after successful authentication via the 'done(null, user)' call in your passport strategy config.
     if (!req.user) {
         console.error("OAuth callback missing user object");
-        return res.status(500).json({ message: "Internal Server Error"});
+        return res.status(500).json({ message: "Internal Server Error" });
     }
 
     try {
@@ -125,13 +130,14 @@ export const handleOAuthCallback = (req, res) => {
         console.log(`OAuth successful for ${req.user.provider || 'provider'}, user:`, req.user.email);
 
         // Generate JWT and set cookie using your existing utility
-        generateToken(req.user._id, res);
+        const token = generateToken(req.user._id, res);
 
+        res.cookie("JWT", token, { httpOnly: true, });
         // Redirect to your frontend dashboard or desired page
-        res.redirect(`${CLIENT_URL}/dashboard`);
+        res.redirect(`${process.env.CLIENT_URL}/`); // Adjust the redirect URL as needed
 
     } catch (err) {
         console.error("Error generating token or redirecting after OAuth:", err);
-        return res.status(500).json({ message: "Internal Server Error"});
+        return res.status(500).json({ message: "Internal Server Error" });
     }
 };

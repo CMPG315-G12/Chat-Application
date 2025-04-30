@@ -60,7 +60,8 @@ Hot reload is enabled so you can just keep the client running as you make change
 
 📄 Check out the full documentation in the [README](./README.md) for installation steps, environment setup, and more.
 
-## ENV
+# ENV
+## Server
 Please ensure you add a .env to the root of the server file
 must include:
 
@@ -98,4 +99,18 @@ must include:
 COOKIE_MAX_AGE_MS=604800000 # Example: 7 days (7 * 24 * 60 * 60 * 1000) - Matches your utils.js
 
 
+## Client
+Please ensure you add a .env to the root of the server file
+must include:
 
+### --- App Info ---
+VITE_APP_NAME=CMPG-G12-ChatApp
+VITE_APP_VERSION=1.0.0
+
+### --- Server Address ---
+VITE_API_URL=http://localhost:5001/api
+
+### --- Dev Info ---
+VITE_NODE_ENV=development
+VITE_DEBUG=true
+VITE_DEBUG_LEVEL=info
