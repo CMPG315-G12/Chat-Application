@@ -7,20 +7,18 @@ import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig(({ command, mode }) => {
 
-  // Debug environment loading
-  console.log('Current working directory:', process.cwd());
-  console.log('Current mode:', mode);
-
   // Load environment variables
   const env = loadEnv(mode, __dirname);
-  console.log('Loaded environment variables:', env);
-
+  
   return {
     main: {
       plugins: [externalizeDepsPlugin()],
       webPreferences: {
         webSecurity: false,
         allowRunningInsecureContent: true,
+      },
+      build: {
+        outDir: 'dist/main',
       },
       csp: {
         'default-src': ["'self'"],
@@ -53,6 +51,9 @@ export default defineConfig(({ command, mode }) => {
 
     preload: {
       plugins: [externalizeDepsPlugin()],
+      build: {
+        outDir: 'dist/preload',
+      },
       csp: {
         'default-src': ["'none'"],
         'script-src': ["'self'"],
@@ -76,6 +77,9 @@ export default defineConfig(({ command, mode }) => {
         }
       },
       plugins: [react(), tailwindcss()],
+      build: {
+        outDir: 'dist/renderer',
+      },
       server: {
         historyApiFallback: true, // Ensures React Router works with Electron
       },

@@ -4,6 +4,7 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 
 
+
 function createWindow() {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
@@ -18,6 +19,8 @@ function createWindow() {
     }
   })
 
+
+
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
   })
@@ -29,7 +32,10 @@ function createWindow() {
 
   // HMR for renderer base on electron-vite cli.
   // Load the remote URL for development or the local html file for production.
-  mainWindow.loadFile(join(__dirname, "../renderer/index.html"));
+  console.log('Loading file:', join(__dirname, "../renderer/index.html"));
+  mainWindow.loadFile(join(__dirname, "../renderer/index.html")).catch((err) => {
+    console.error('Failed to load index.html:', err);
+  });
 }
 
 // This method will be called when Electron has finished

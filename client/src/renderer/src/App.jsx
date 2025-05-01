@@ -38,7 +38,7 @@ const App = () => {
         <Route path='/profile' element={authUser ? <ProfilePage /> : <Navigate to="/login" />} />
 
         {/* Catch-all route */}
-        <Route path="*" element={<Navigate to="/" />} />
+        <Route path="*" element={<Navigate to="/signup" />} />
       </Routes>
 
       <Toaster />
