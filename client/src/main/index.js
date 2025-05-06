@@ -72,3 +72,101 @@ app.on('window-all-closed', () => {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
+//General client functionality starts here
+// index.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Electron Chat App</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="chat-app">
+    <div id="contact-list"></div>
+    <div id="chat-window"></div>
+    <form id="message-form">
+      <input type="text" id="message-input" placeholder="Type a message..." />
+      <button type="submit">Send</button>
+    </form>
+  </div>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
+
+// style.css
+body {
+  font-family: Arial, sans-serif;
+  background: #f4f4f4;
+  margin: 0;
+  padding: 0;
+}
+#chat-app {
+  display: flex;
+  flex-direction: column;
+  max-width: 600px;
+  margin: 20px auto;
+  background: white;
+  border: 1px solid #ccc;
+  padding: 10px;
+}
+#chat-window {
+  height: 300px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  margin-bottom: 10px;
+  padding: 5px;
+}
+#message-form {
+  display: flex;
+}
+#message-input {
+  flex: 1;
+  padding: 5px;
+}
+button {
+  padding: 5px 10px;
+}
+
+// app.js
+import { setupSocket } from './socket.js';
+import { renderMessage } from './components/chatWindow.js';
+import { setupForm } from './components/messageForm.js';
+
+const socket = setupSocket();
+socket.on('chat message', renderMessage);
+
+setupForm(socket);
+
+// socket.js
+import { io } from 'socket.io-client';
+
+export function setupSocket() {
+  const socket = io('http://localhost:3000');
+  socket.on('connect', () => console.log('Connected to server'));
+  return socket;
+}
+
+// components/chatWindow.js
+export function renderMessage(msg) {
+  const chatWindow = document.getElementById('chat-window');
+  const msgElem = document.createElement('div');
+  msgElem.textContent = msg;
+  chatWindow.appendChild(msgElem);
+  chatWindow.scrollTop = chatWindow.scrollHeight;
+}
+
+// components/messageForm.js
+export function setupForm(socket) {
+  const form = document.getElementById('message-form');
+  const input = document.getElementById('message-input');
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    if (input.value.trim()) {
+      socket.emit('chat message', input.value);
+      input.value = '';
+    }
+  });
+}
