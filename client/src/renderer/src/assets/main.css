@@ -1,3 +1,55 @@
 @import './base.css';
 
-/* Any aditional css for whole proj - tailwind is configured */
+/* Discord-like theme colors */
+:root {
+  --sidebar-bg: #1e1f22;
+  --info-bar-bg: #2b2d31;
+  --chat-area-bg: #313338;
+  --text-primary: #dbdee1;
+  --text-secondary: #b5bac1;
+  --accent-color: #00589b;
+  --message-bg: #383a40;
+  --message-time: #a3a6aa;
+  --input-bg: #383a40;
+  --button-danger: #FF746C;
+  --button-success: #96DD99;
+}
+
+/* Light mode colors */
+.light-mode {
+  --sidebar-bg: #B1B1B1;
+  --info-bar-bg: #CFCFCF;
+  --chat-area-bg: #F5F5F5;
+  --text-primary: #060607;
+  --text-secondary: #4e5058;
+  --accent-color: #61bee4;
+  --message-bg: #f2f3f5;
+  --message-time: #74777a;
+  --input-bg: #f2f3f5;
+}
+
+/* Base styles */
+body {
+  color: var(--text-primary);
+  background-color: var(--chat-area-bg);
+  font-family: 'Whitney', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+/* Scrollbar styles */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--sidebar-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--info-bar-bg);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
