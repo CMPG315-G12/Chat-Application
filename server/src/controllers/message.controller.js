@@ -1,3 +1,4 @@
+import Group from "../models/group.models.js";
 import Message from "../models/message.model.js";
 import User from "../models/user.models.js";
 
@@ -6,8 +7,11 @@ export const getUsersForContactList = async (req, res) => {
     try {
 
         const loggedInUserId = req.user._id;
-        const returnList = "_id email displayName";
-        const filteredUsers = await User.findById(loggedInUserId).populate({ path: "friends", select: `${returnList}` }).select("friends");
+        const returnList = "_id email displayName profilePic";
+        const filteredUsers = await User.findById(loggedInUserId)
+            .populate({ path: "friends", select: returnList }) // Populate friends
+            .populate({ path: "groups", select: "_id name description" }) // Populate groups
+            .select("friends groups");
 
         res.status(200).json(filteredUsers);
     } catch (err) {
@@ -17,7 +21,7 @@ export const getUsersForContactList = async (req, res) => {
 }
 
 //Recipient is the destiantions of the messages - 1:1 = recipiant userId
-export const getMessages = async (req, res) => {
+export const getMessagesU = async (req, res) => {
     try {
         const { id: recipient } = req.params;
         const userId = req.user._id;
@@ -37,7 +41,28 @@ export const getMessages = async (req, res) => {
     }
 }
 
-export const sendMessage = async (req, res) => {
+//get group messages
+export const getMessagesG = async (req, res) => {
+    try {
+        const { id: groupId } = req.params;
+        const userId = req.user._id;
+
+        //Get all messages sent and recived between the two users 
+        const messages = await Message.find({
+            $or: [
+                { senderId: userId, recipientId: groupId },
+                { senderId: groupId, recipientId: userId }
+            ]
+        })
+
+        res.status(200).json(messages);
+    } catch (err) {
+        console.log("Error in getMessages Controller:", err);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+}
+
+export const sendMessageU = async (req, res) => {
     try {
         const { text, image } = req.body;
         const { id: recipientId } = req.params;
@@ -51,7 +76,7 @@ export const sendMessage = async (req, res) => {
 
         const newMessage = new Message({
             senderId: senderId,
-            recipientId, recipientId,
+            recipientId: recipientId,
             text: text,
             //image: <insert ref to image>
         })
@@ -64,6 +89,204 @@ export const sendMessage = async (req, res) => {
         res.status(201).json(newMessage);
     } catch (err) {
         console.log("Error in sendMessageController: ", err);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+}
+
+//send group message
+export const sendMessageG = async (req, res) => {
+    try {
+        const { text, image } = req.body;
+        const { id: groupId } = req.params;
+        const senderId = req.user._id;
+
+        //TODO: Image Sending
+        let ImageURL;
+        if (image) {
+            //Implement Image API
+        }
+
+        const newMessage = new Message({
+            senderId: senderId,
+            recipientId: groupId,
+            text: text,
+            //image: <insert ref to image>
+        })
+
+        await newMessage.save();
+
+        //TODO:socket.io for realtime
+
+
+        res.status(201).json(newMessage);
+    } catch (err) {
+        console.log("Error in sendMessageController: ", err);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+}
+
+export const newGroup = async (req, res) => {
+    try {
+
+        const { name, description } = req.body;
+        const userId = req.user._id;
+
+        const newGroup = new Group({
+            name: name,
+            description: description,
+            members: [userId],
+            createdBy: userId
+        })
+        await newGroup.save();
+
+        await User.findByIdAndUpdate(userId, { $push: { groups: newGroup._id } }, { new: true });
+        res.status(201).json(newGroup);
+
+    }
+    catch (err) {
+        console.log("Error in newGroupController: ", err);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+}
+
+export const joinGroup = async (req, res) => {
+    const { id: groupCode } = req.params; // Extract groupCode from the request parameters
+    const userId = req.user._id; // Get the user ID from the authenticated user
+
+    try {
+        // Find the group by groupCode
+        const group = await Group.findOne({ groupCode }).populate("members", "_id");
+        if (!group) {
+            return res.status(404).json({ message: "Group not found" });
+        }
+
+        // Check if the user is already a member of the group
+        const isAlreadyMember = group.members.some(member => member._id.toString() === userId.toString());
+
+        if (isAlreadyMember) {
+            return res.status(400).json({ message: "Already a member of the group" });
+        }
+
+        // Add userId to the group's members list
+        await Group.findOneAndUpdate(
+            { groupCode },
+            { $addToSet: { members: userId } },
+            { new: true }
+        );
+
+        // Add groupId to the user's groups list
+        await User.findByIdAndUpdate(
+            userId,
+            { $addToSet: { groups: group._id } },
+            { new: true }
+        );
+
+        res.status(200).json({ message: "Joined group successfully" });
+    } catch (err) {
+        console.log("Error in joinGroupController: ", err);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+}
+
+export const leaveGroup = async (req, res) => {
+    const { id: groupCode } = req.params; // Extract groupCode from the request parameters
+    const userId = req.user._id; // Get the user ID from the authenticated user
+
+    try {
+        // Find the group by groupCode
+        const group = await Group.findOne({ groupCode }).populate("members", "_id");
+        if (!group) {
+            return res.status(404).json({ message: "Group not found" });
+        }
+
+        // Check if the user is already a member of the group
+        const isAlreadyMember = group.members.some(member => member._id.toString() === userId.toString());
+
+        if (!isAlreadyMember) {
+            return res.status(400).json({ message: "Not Member in Group" });
+        }
+
+        // Remove userId to the group's members list
+        await Group.findOneAndUpdate(
+            { groupCode },
+            { $pull: { members: userId } },
+            { new: true }
+        );
+
+        // Remove groupId to the user's groups list
+        await User.findByIdAndUpdate(
+            userId,
+            { $pull: { groups: group._id } },
+            { new: true }
+        );
+
+        res.status(200).json({ message: "Left group successfully" });
+    } catch (err) {
+        console.log("Error in joinGroupController: ", err);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+}
+
+export const addFirend = async (req, res) => {
+    const { id: friendId } = req.params;
+    const userId = req.user._id;
+
+    try {
+
+        // Check if the userId and friendId are the same
+        if (userId.toString() === friendId.toString()) {
+            return res.status(400).json({ message: "Cannot add yourself as a friend" });
+        }
+
+        // Check if the user is already friends with the friendId
+        const user = await User.findById(userId).populate("friends");
+        const isAlreadyFriend = user.friends.some(friend => friend._id.toString() === friendId);
+
+        if (isAlreadyFriend) {
+            return res.status(400).json({ message: "Already friends" });
+        }
+
+        // Add friendId to user's friends list
+        await User.findByIdAndUpdate(userId, { $addToSet: { friends: friendId } }, { new: true });
+
+        // Add userId to friend's friends list
+        await User.findByIdAndUpdate(friendId, { $addToSet: { friends: userId } }, { new: true });
+
+        res.status(200).json({ message: "Friend added successfully" });
+    }
+    catch (err) {
+        console.log("Error in addFriendController: ", err);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+}
+
+export const removeFriend = async (req, res) => {
+    const { id: friendId } = req.params;
+    const userId = req.user._id;
+
+    try {
+        // Check if the userId and friendId are the same
+        if (userId.toString() === friendId.toString()) {
+            return res.status(400).json({ message: "Cannot remove yourself as a friend" });
+        }
+        // Check if the user is already friends with the friendId
+        const user = await User.findById(userId).populate("friends");
+        const isAlreadyFriend = user.friends.some(friend => friend._id.toString() === friendId);
+
+        if (!isAlreadyFriend) {
+            return res.status(400).json({ message: "Not friends" });
+        }
+
+        // Remove friendId from user's friends list
+        await User.findByIdAndUpdate(userId, { $pull: { friends: friendId } }, { new: true });
+
+        // Remove userId from friend's friends list
+        await User.findByIdAndUpdate(friendId, { $pull: { friends: userId } }, { new: true });
+
+        res.status(200).json({ message: "Friend removed successfully" });
+    }
+    catch (err) {
+        console.log("Error in removeFriendController: ", err);
         res.status(500).json({ message: "Internal Server Error" });
     }
 }

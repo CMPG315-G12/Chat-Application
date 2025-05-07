@@ -11,7 +11,6 @@ import { protectRoute } from "../middleware/auth.middleware.protectRoute.js";
 import passport from "passport";
 
 const router = express.Router();
-const CLIENT_URL = process.env.CLIENT_URL;
 
 router.post("/signup", signup);
 router.post("/login", login);

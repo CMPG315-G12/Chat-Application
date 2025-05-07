@@ -4,12 +4,16 @@ import toast from 'react-hot-toast';
 
 
 export const useAuthStore = create((set) => ({
+
     authUser: null,
+    authToken: null,
     provider: null,
     isSigningUp: false,
     isLoggingIn: false,
     isUpdatingProfile: false,
-    isChechingAuth: true,
+    isCheckingAuth: true,
+
+    onlineUsers: [],
 
     isProviderSignup: false,
     isProvirderLogin: false,
@@ -21,34 +25,33 @@ export const useAuthStore = create((set) => ({
 
             set({
                 authUser: res.data.user,
-                isChechingAuth: false,
+                isCheckingAuth: false,
             });
 
         } catch (err) {
-            console.log("Error in checkAuth",err);
-            set({
-                authUser: null,
-            });
+            console.log("Error in checkAuth", err);
+            if (err.response?.status === 401) {
+                set({ authUser: null });
+            }
         } finally {
-            set({ isChechingAuth: false });
+            set({ isCheckingAuth: false });
         }
     },
 
     signup: async (Data) => {
         set({ isSigningUp: true });
         try {
-            
+
             const res = await axiosInstance.post('/auth/signup', Data);
             set({
                 authUser: res.data.user,
-                isSigningUp: false,
+                authToken: res.data.token,
             });
 
             toast.success("Signup successful!");
-            window.location.href = res.data.redirectUrl || '/';
+            return { success: true, redirectUrl: res.data.redirectUrl || '/' };
         } catch (err) {
             console.log("Error in signup", err);
-            set({ isSigningUp: false });
             toast.error(err.response.data.message || "Signup failed!");
         } finally {
             set({ isSigningUp: false });
@@ -61,14 +64,13 @@ export const useAuthStore = create((set) => ({
             const res = await axiosInstance.post('/auth/login', Data);
             set({
                 authUser: res.data.user,
-                isLoggingIn: false,
+                authToken: res.data.token,
             });
 
             toast.success("Login successful!");
-            window.location.href = res.data.redirectUrl || '/';
+            return { success: true, redirectUrl: res.data.redirectUrl || '/' };
         } catch (err) {
             console.log("Error in login", err);
-            set({ isLoggingIn: false });
             toast.error(err.response.data.message || "Login failed!");
         } finally {
             set({ isLoggingIn: false });
@@ -78,18 +80,26 @@ export const useAuthStore = create((set) => ({
     logout: async () => {
         try {
             const res = await axiosInstance.post('/auth/logout');
-            set({ authUser: null });
+            set({ authUser: null, authToken: null });
             toast.success(res.data.message || "Logout successful!");
-            window.location.href = '/login';
+            return { success: true, redirectUrl: '/login' };
         } catch (err) {
             console.log("Error in logout", err);
             toast.error(err.response.data.message || "Logout failed!");
         }
     },
-    
 
-    providerSignup: (provider) => {
-        // Redirect the user to the backend's OAuth endpoint
-        window.location.href = `${__API_URL__}/auth/${provider}`;
-    },
+
+    providerSignup: async (provider) => {
+        return new Promise((resolve) => {
+          // Listen for the event before calling the login
+          window.electron.on('oauth-complete', () => {
+            console.log('OAuth completed');
+            resolve({ success: true, redirectUrl: '/' });
+          });
+      
+          // Trigger the OAuth login process
+          window.electron.invoke('oauth-login', provider);
+        });
+      }
 }));

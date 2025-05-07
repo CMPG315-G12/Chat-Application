@@ -7,12 +7,15 @@ import LogInPage from './pages/LogInPage';
 import SettingsPage from './pages/SettingsPage';
 import ProfilePage from './pages/ProfilePage';
 import { useAuthStore } from './store/useAuthStore.js';
+import { useThemeStore } from './store/useThemeStore.js';
 import { Loader } from "lucide-react";
 import { Toaster } from 'react-hot-toast';
 
 const App = () => {
 
   const { authUser, checkAuth, isCheckingAuth } = useAuthStore();
+
+  const { theme } = useThemeStore();
 
   // Check if the user is authenticated when the component mounts
   useEffect(() => {
@@ -29,7 +32,7 @@ const App = () => {
     </div>
   );
   return (
-    <div>
+    <div data-theme={theme}>
       <Routes>
         <Route path='/' element={authUser ? <HomePage /> : <Navigate to="/login" />} />
         <Route path='/signup' element={!authUser ? <SignUpPage /> : <Navigate to="/" />} />

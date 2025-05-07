@@ -31,15 +31,18 @@ export const signup = async (req, res) => {
             const token = generateToken(newUser._id, res);
             await newUser.save();
 
-            res.cookie("JWT", token, { httpOnly: true, });
+            // res.cookie("JWT", token, { httpOnly: true, });
             res.status(201).json({
-                _id: newUser._id,
-                fullName: newUser.fullName,
-                email: newUser.email,
-                profilePic: newUser.profilePic,
-                redirectUrl: `${process.env.CLIENT_URL}/`
+                user: {
+                    _id: newUser._id,
+                    fullName: newUser.fullName,
+                    email: newUser.email,
+                    profilePic: newUser.profilePic
+                },
+                redirectUrl: `${process.env.CLIENT_URL}/`,
+                token
             }); // Adjust the redirect URL as needed
-            
+
         } else {
             res.status(400).json({ message: "Invalid User Data" });
         }
@@ -63,13 +66,16 @@ export const login = async (req, res) => {
         if (!isPassCorrect) { return res.status(400).json({ message: "Invaild Credentials" }) };
 
         const token = generateToken(user._id, res);
-        res.cookie("JWT", token, { httpOnly: true, });
+        // res.cookie("JWT", token, { httpOnly: true, });
         res.status(200).json({
-            _id: user._id,
-            fullName: user.fullName,
-            email: user.email,
-            profilePic: user.profilePic,
-            redirectUrl: `${process.env.CLIENT_URL}/`
+            user: {
+                _id: user._id,
+                fullName: user.fullName,
+                email: user.email,
+                profilePic: user.profilePic
+            },
+            redirectUrl: `${process.env.CLIENT_URL}/`,
+            token
         }); // Adjust the redirect URL as needed
 
     } catch (err) {
@@ -80,7 +86,7 @@ export const login = async (req, res) => {
 
 export const logout = (req, res) => {
     try {
-        res.cookie("JWT", "", { maxAge: 0 });
+        // res.cookie("JWT", "", { maxAge: 0 });
         res.status(200).json({ message: "Logout Succesful" });
 
     } catch (err) {
@@ -132,9 +138,20 @@ export const handleOAuthCallback = (req, res) => {
         // Generate JWT and set cookie using your existing utility
         const token = generateToken(req.user._id, res);
 
-        res.cookie("JWT", token, { httpOnly: true, });
+        // res.cookie("JWT", token, { httpOnly: true, });
         // Redirect to your frontend dashboard or desired page
-        res.redirect(`${process.env.CLIENT_URL}/`); // Adjust the redirect URL as needed
+        // This small HTML triggers Electron's OAuth window to post success to main window
+        res.send(`
+            <html>
+            <body>
+                <script>
+                window.opener?.postMessage({ type: "oauth-success" }, "*");
+                window.close();
+                </script>
+                <p>Login successful. You can close this window.</p>
+            </body>
+            </html>
+        `);
 
     } catch (err) {
         console.error("Error generating token or redirecting after OAuth:", err);

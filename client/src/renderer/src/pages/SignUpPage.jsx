@@ -1,7 +1,8 @@
 import React from 'react'
 import { useAuthStore } from '../store/useAuthStore';
 import { Eye, EyeOff, Loader2, MessageSquare } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+
 
 const SignUpPage = () => {
     const [showPassword, setShowPassword] = React.useState(false);
@@ -16,6 +17,18 @@ const SignUpPage = () => {
 
     const { signup, isSigningUp } = useAuthStore();
 
+    const { providerSignup } = useAuthStore();
+
+    const navigate = useNavigate();
+
+
+    const handleProviderSignup = async (provider) => {
+        const result = await providerSignup(provider);
+        if (result.success) {
+            navigate(result.redirectUrl);
+        }
+    };
+
     const handleSubmit = async (e) => {
         // Prevent default form submission
         e.preventDefault();
@@ -26,15 +39,18 @@ const SignUpPage = () => {
             ...formData,
             fullName: `${formData.firstName} ${formData.lastName}`,
         };
-        signup(updatedFormData);
+
+        const result = await signup(updatedFormData);
+        if (result.success) {
+            navigate(result.redirectUrl);
+        }
     };
 
-    const { providerSignup } = useAuthStore();
     return (
         // Sign Up Page Container
-        <div className="flex items-center justify-center min-h-screen min-w-10 --color-background-mute">
+        <div className="flex items-center justify-center min-h-screen min-w-10 bg-base-200">
             {/* Sign Up Puck */}
-            <div className="w-full max-w-xl p-8 space-y-6 bg-white rounded-lg shadow-md">
+            <div className="w-full max-w-xl p-8 space-y-6 bg-base-100 rounded-lg shadow-md">
                 {/* Logo */}
                 <div className="flex items-center justify-center mb-6">
                     <div className="size-12 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
@@ -43,20 +59,21 @@ const SignUpPage = () => {
                 </div>
 
                 {/* Title and Description */}
-                <h2 className="text-2xl font-bold text-center text-gray-800">
+                <h2 className="text-2xl font-bold text-center text-accent-content">
                     Sign Up
                 </h2>
-                <p className="text-sm text-center text-gray-500">
+                <p className="text-sm text-center text-accent-content/70">
                     Create an account to get started
                 </p>
 
                 {/* OAuth Buttons */}
-                <div className="flex justify-between space-x-3 ">
+
+                {/* <div className="flex justify-between space-x-3 ">
                     {[
                         {
                             name: "Google",
                             provider: "google",
-                            styles: "text-gray-700 bg-white border border-gray-300 hover:bg-gray-50",
+                            styles: "text-accent-content/70 bg-white border border-gray-300 hover:bg-gray-50",
                             svg: (
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" className="w-6 h-6 mr-2">
                                     <path fill="#EA4335" d="M24 9.5c3.1 0 5.9 1.1 8.1 3.2l6-6C34.4 3.5 29.5 1.5 24 1.5 14.8 1.5 7.2 7.8 4.5 16.1l7.4 5.7C13.3 14.2 18.2 9.5 24 9.5z" />
@@ -96,7 +113,7 @@ const SignUpPage = () => {
                     ].map(({ name, provider, styles, svg }) => (
                         <button
                             key={provider}
-                            onClick={() => providerSignup(provider)}
+                            onClick={() => handleProviderSignup(provider)}
                             className={`flex items-center justify-center flex-1 px-4 py-2 text-sm font-medium rounded-lg shadow-sm ${styles}`}
                         >
                             {svg}
@@ -106,18 +123,18 @@ const SignUpPage = () => {
                 </div>
 
                 <div className="relative flex items-center justify-center">
-                    <span className="absolute px-2 text-sm text-gray-500 bg-white">
+                    <span className="absolute px-2 text-sm text-accent-content/70 bg-white">
                         Or continue with
                     </span>
                     <div className="w-full border-t border-gray-300"></div>
-                </div>
+                </div> */}
 
                 {/* Email Signup Form */}
                 <form className="space-y-6" onSubmit={handleSubmit}>
                     {/* Name and Surname */}
-                    <div className="flex space-x-4 mb-1">
-                        <fieldset className="Fieldset">
-                            <legend className="fieldset-legend text-gray-700">First Name</legend>
+                    <div className="flex space-x-4 mb-1 ">
+                        <fieldset className="Fieldset w-full">
+                            <legend className="fieldset-legend text-accent-content/70">First Name</legend>
                             <label className="input validator ">
                                 <svg className="h-[1em] opacity-50" xmlns="http</label>://www.w3.org/2000/svg" viewBox="0 0 24 24">
                                     <g
@@ -144,8 +161,8 @@ const SignUpPage = () => {
                                 />
                             </label>
                         </fieldset>
-                        <fieldset className="Fieldset">
-                            <legend className="fieldset-legend text-gray-700">Last Name</legend>
+                        <fieldset className="Fieldset w-full">
+                            <legend className="fieldset-legend text-accent-content/70">Last Name</legend>
                             <label className="input validator ">
                                 <svg className="h-[1em] opacity-50" xmlns="http</label>://www.w3.org/2000/svg" viewBox="0 0 24 24">
                                     <g
@@ -175,7 +192,7 @@ const SignUpPage = () => {
                     </div>
                     {/* Username */}
                     <fieldset className="Fieldset mb-1">
-                        <legend className="fieldset-legend text-gray-700">Username</legend>
+                        <legend className="fieldset-legend text-accent-content/70">Username</legend>
                         <label className="input validator w-full">
                             <svg className="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                                 <g
@@ -206,7 +223,7 @@ const SignUpPage = () => {
 
                     {/* Email */}
                     <fieldset className="Fieldset mb-1">
-                        <legend className="fieldset-legend text-gray-700">Email</legend>
+                        <legend className="fieldset-legend text-accent-content/70">Email</legend>
                         <label className="input validator w-full">
                             <svg className="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                                 <g
@@ -235,7 +252,7 @@ const SignUpPage = () => {
 
                     {/* Password with viablilaty toggle */}
                     <fieldset className="Fieldset mb-4">
-                        <legend className="fieldset-legend text-gray-700">Password</legend>
+                        <legend className="fieldset-legend text-accent-content/70">Password</legend>
                         <label className="input validator w-full">
                             <svg className="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                                 <g
@@ -292,7 +309,7 @@ const SignUpPage = () => {
                 </form>
 
                 {/* To Login */}
-                <p className="text-sm text-center text-gray-500">
+                <p className="text-sm text-center text-accent-content/70">
                     Already have an account?{" "}
                     <Link to="/login" className="link text-indigo-600 hover:underline">
                         Log in

@@ -6,6 +6,16 @@ import { LogOut, MessageSquare, Settings, User } from 'lucide-react';
 const Navbar = () => {
     const { logout, authUser } = useAuthStore();
 
+    const handleLogout = async (e) => {
+        // Prevent default form submission
+        e.preventDefault();
+
+        const result = await logout();
+        if (result.success) {
+            navigate(result.redirectUrl);
+        }
+    };
+
 
     return (
         <header className="border-b border-base-300 fixed w-full top-0 z-40 backdrop:blur-lg bg-base-100/80">
@@ -28,12 +38,11 @@ const Navbar = () => {
                             <Settings className='size-5' />
                             <span className='hidden sm:inline'>Settings</span>
                         </Link>
-                        <button onClick={logout} className="btn btn-primary">
-                            <LogOut className='size-5 mr-2' />
+                        <button onClick={handleLogout} className="btn btn-primary btn-sm gap-2 hover:opacity-80 transition-all">
+                            <LogOut className='size-5' />
                             <span className='hidden sm:inline'>Logout</span>
                         </button>
                     </div>
-                    
                 </div>
             </div>
         </header>

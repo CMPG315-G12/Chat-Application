@@ -1,21 +1,22 @@
-import { app, shell, BrowserWindow } from 'electron'
+import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import path, { join } from 'path';
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 
 
-
 function createWindow() {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 900,
-    height: 670,
+    width: 1100,
+    height: 800,
     show: false,
     autoHideMenuBar: true,
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
-      sandbox: false
+      sandbox: false,
+      webSecurity: false,
+      contextIsolation: true,
     }
   })
 
@@ -32,10 +33,8 @@ function createWindow() {
 
   // HMR for renderer base on electron-vite cli.
   // Load the remote URL for development or the local html file for production.
-  console.log('Loading file:', join(__dirname, "../renderer/index.html"));
-  mainWindow.loadFile(join(__dirname, "../renderer/index.html")).catch((err) => {
-    console.error('Failed to load index.html:', err);
-  });
+
+  mainWindow.loadURL(join(__dirname, '../renderer/index.html'));
 }
 
 // This method will be called when Electron has finished
@@ -72,3 +71,5 @@ app.on('window-all-closed', () => {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
+
+

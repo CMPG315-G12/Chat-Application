@@ -1,4 +1,3 @@
-import { text } from "express";
 import mongoose from "mongoose";
 
 const messageSchema = new mongoose.Schema(
@@ -10,7 +9,7 @@ const messageSchema = new mongoose.Schema(
         },
         recipientId: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
+            ref: "User" || "Group",
             required: true,
         },
         text: {

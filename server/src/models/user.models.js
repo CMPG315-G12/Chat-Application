@@ -6,7 +6,6 @@ const userSchema = new mongoose.Schema(
             type: String,
             required: true,
             unique: true,
-            //Logic needed for if user tries to log in from diffrent platforms
         },
         fullName: {
             type: String,
@@ -38,6 +37,10 @@ const userSchema = new mongoose.Schema(
         friends: [{
             type: Schema.Types.ObjectId,
             ref: "User",
+        }],
+        groups: [{
+            type: Schema.Types.ObjectId,
+            ref: "Group",
         }],
         profilePic: {
             type: String,

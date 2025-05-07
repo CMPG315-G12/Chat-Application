@@ -20,7 +20,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
     cors({
-        origin: process.env.CLIENT_URL || "http://localhost:3000", // Allow requests from your frontend
+        origin: "*", // Allow requests from your frontend
         methods: ["GET", "POST", "PUT", "DELETE"], // Specify allowed HTTP methods
         credentials: true, // Allow cookies and credentials
         allowedHeaders: ["Content-Type", "Authorization"], // Specify allowed headers

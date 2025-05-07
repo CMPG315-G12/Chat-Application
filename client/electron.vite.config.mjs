@@ -12,6 +12,7 @@ export default defineConfig(({ command, mode }) => {
   
   return {
     main: {
+      entry: 'src/main/index.js',
       plugins: [externalizeDepsPlugin()],
       webPreferences: {
         webSecurity: false,
@@ -54,6 +55,7 @@ export default defineConfig(({ command, mode }) => {
       build: {
         outDir: 'dist/preload',
       },
+      entry: 'src/preload/index.js',
       csp: {
         'default-src': ["'none'"],
         'script-src': ["'self'"],
@@ -80,7 +82,9 @@ export default defineConfig(({ command, mode }) => {
       build: {
         outDir: 'dist/renderer',
       },
+      
       server: {
+        https: false,
         historyApiFallback: true, // Ensures React Router works with Electron
       },
       csp: {
