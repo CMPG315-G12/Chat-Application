@@ -51,7 +51,7 @@ export const getMessagesG = async (req, res) => {
         const messages = await Message.find({
             $or: [
                 { senderId: userId, recipientId: groupId },
-                { senderId: groupId, recipientId: userId }
+                { recipientId: groupId }
             ]
         })
 

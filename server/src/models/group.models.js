@@ -21,12 +21,6 @@ const groupSchema = new mongoose.Schema({
             ref: 'User',
         },
     ],
-    messages: [
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'Message',
-        },
-    ],
     createdBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
