@@ -1,4 +1,3 @@
-// filepath: c:\DEV\Chat-App\Chat-Application\client\src\renderer\src\pages\ManagementPage.jsx
 import React, { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import { useManagementStore } from '../store/useManagementStore';
