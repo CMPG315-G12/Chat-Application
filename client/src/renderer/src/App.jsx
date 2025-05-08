@@ -6,6 +6,7 @@ import SignUpPage from './pages/SignUpPage';
 import LogInPage from './pages/LogInPage';
 import SettingsPage from './pages/SettingsPage';
 import ProfilePage from './pages/ProfilePage';
+import ManagementPage from './pages/ManagementPage';
 import { useAuthStore } from './store/useAuthStore.js';
 import { useThemeStore } from './store/useThemeStore.js';
 import { Loader } from "lucide-react";
@@ -37,6 +38,7 @@ const App = () => {
         <Route path='/login' element={!authUser ? <LogInPage /> : <Navigate to="/" />} />
         <Route path='/settings' element={authUser ? <SettingsPage /> : <Navigate to="/login" />} />
         <Route path='/profile' element={authUser ? <ProfilePage /> : <Navigate to="/login" />} />
+        <Route path='/manage' element={authUser ? <ManagementPage /> : <Navigate to="/login" />} />
 
         {/* Catch-all route */}
         <Route path="*" element={<Navigate to="/signup" />} />

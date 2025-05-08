@@ -1,6 +1,19 @@
 import express from "express";
 import { protectRoute } from "../middleware/auth.middleware.protectRoute.js";
-import { getUsersForContactList, getMessagesU, getMessagesG, sendMessageU, sendMessageG, newGroup, joinGroup, leaveGroup, addFirend, removeFriend } from "../controllers/message.controller.js";
+import { 
+    getUsersForContactList, 
+    getMessagesU, 
+    getMessagesG, 
+    sendMessageU, 
+    sendMessageG, 
+    newGroup, 
+    joinGroup, 
+    leaveGroup, 
+    addFirend, 
+    removeFriend,
+    markMessagesAsDelivered,
+    markMessagesAsRead 
+} from "../controllers/message.controller.js";
 const router = express.Router();
 
 /* --- Get Users for Contact List --- */
@@ -11,6 +24,10 @@ router.get("/u/:id", protectRoute, getMessagesU);
 router.get("/g/:id", protectRoute, getMessagesG);
 router.post("/send/u/:id", protectRoute, sendMessageU);
 router.post("/send/g/:id", protectRoute, sendMessageG);
+
+/* --- Message Status Updates --- */
+router.post("/delivered/:id", protectRoute, markMessagesAsDelivered);
+router.post("/read/:id", protectRoute, markMessagesAsRead);
 
 /* --- Group Management --- */
 router.post("/create/group", protectRoute, newGroup);

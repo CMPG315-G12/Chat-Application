@@ -140,9 +140,13 @@ export const sendMessageG = async (req, res) => {
 
 export const newGroup = async (req, res) => {
     try {
-
         const { name, description } = req.body;
         const userId = req.user._id;
+
+        // Check if name is provided and not empty
+        if (!name || name.trim() === '') {
+            return res.status(400).json({ message: "Group name is required" });
+        }
 
         const newGroup = new Group({
             name: name,
@@ -303,3 +307,90 @@ export const removeFriend = async (req, res) => {
         res.status(500).json({ message: "Internal Server Error" });
     }
 }
+
+export const markMessagesAsDelivered = async (req, res) => {
+    try {
+        const { id: senderId } = req.params; // The sender of the messages
+        const userId = req.user._id; // The current user who received the messages
+
+        // Find all undelivered messages from this sender to the current user
+        const messages = await Message.updateMany(
+            { 
+                senderId: senderId,
+                recipientId: userId,
+                status: 'sent'
+            },
+            { 
+                $set: { status: 'delivered' } 
+            }
+        );
+
+        // Notify the sender about delivered messages
+        const senderSocketId = getRecieverSocketId(senderId);
+        if (senderSocketId) {
+            io.to(senderSocketId).emit("messages:delivered", {
+                userId: userId,
+                timestamp: new Date()
+            });
+        }
+
+        res.status(200).json({ message: "Messages marked as delivered" });
+    } catch (err) {
+        console.log("Error in markMessagesAsDelivered:", err);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+};
+
+export const markMessagesAsRead = async (req, res) => {
+    try {
+        const { id: senderId } = req.params; // The sender of the messages
+        const userId = req.user._id; // The current user who is reading the messages
+
+        // Find all delivered but unread messages from this sender to current user
+        const messages = await Message.find({
+            senderId: senderId,
+            recipientId: userId,
+            status: { $in: ['sent', 'delivered'] }
+        });
+
+        // Update each message's status and add current user to readBy
+        const updates = messages.map(async (message) => {
+            message.status = 'read';
+            
+            // Check if user already marked as read
+            const alreadyRead = message.readBy.some(
+                reader => reader.userId.toString() === userId.toString()
+            );
+            
+            if (!alreadyRead) {
+                message.readBy.push({
+                    userId: userId,
+                    readAt: new Date()
+                });
+            }
+            
+            return message.save();
+        });
+        
+        await Promise.all(updates);
+
+        // Notify the sender about read messages
+        const messageIds = messages.map(msg => msg._id);
+        const senderSocketId = getRecieverSocketId(senderId);
+        if (senderSocketId && messageIds.length > 0) {
+            io.to(senderSocketId).emit("messages:read", {
+                userId: userId,
+                messageIds: messageIds,
+                timestamp: new Date()
+            });
+        }
+
+        res.status(200).json({ 
+            message: "Messages marked as read",
+            count: messageIds.length
+        });
+    } catch (err) {
+        console.log("Error in markMessagesAsRead:", err);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+};

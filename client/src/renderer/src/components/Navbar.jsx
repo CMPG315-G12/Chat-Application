@@ -1,7 +1,7 @@
 import React from 'react'
 import { useAuthStore } from '../store/useAuthStore'
 import { Link, useNavigate } from 'react-router-dom';
-import { LogOut, MessageSquare, Settings, User } from 'lucide-react';
+import { LogOut, MessageSquare, Settings, User, Users } from 'lucide-react';
 
 const Navbar = () => {
     const { logout } = useAuthStore();
@@ -30,7 +30,11 @@ const Navbar = () => {
                             <h1 className="text-lg font-bold">ChatApp</h1>
                         </Link>
                     </div>
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2 md:gap-3">
+                        <Link to="/manage" className="btn btn-primary btn-sm gap-2 hover:opacity-80 transition-all">
+                            <Users className='size-5' />
+                            <span className='hidden sm:inline'>Contacts</span>
+                        </Link>
                         <Link to="/profile" className="btn btn-primary btn-sm gap-2 hover:opacity-80 transition-all">
                             <User className='size-5' />
                             <span className='hidden sm:inline'>Profile</span>

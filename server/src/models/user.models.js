@@ -46,7 +46,7 @@ const userSchema = new mongoose.Schema(
             type: String,
             default: function () {
                 const randomIndex = Math.floor(Math.random() * 5);
-                `https://cdn.discordapp.com/embed/avatars/${randomIndex}.png`
+                return `https://cdn.discordapp.com/embed/avatars/${randomIndex}.png`;
             },
         },
 
