@@ -2,6 +2,8 @@ import Group from "../models/group.models.js";
 import Message from "../models/message.model.js";
 import User from "../models/user.models.js";
 
+import { getRecieverSocketId, io} from "../lib/socket_io.js";
+
 //Returns an array with the "friend" objects
 export const getUsersForContactList = async (req, res) => {
     try {
@@ -10,7 +12,7 @@ export const getUsersForContactList = async (req, res) => {
         const returnList = "_id email displayName profilePic";
         const filteredUsers = await User.findById(loggedInUserId)
             .populate({ path: "friends", select: returnList }) // Populate friends
-            .populate({ path: "groups", select: "_id name description" }) // Populate groups
+            .populate({ path: "groups", select: "_id name description groupCode" }) // Populate groups
             .select("friends groups");
 
         res.status(200).json(filteredUsers);
@@ -83,8 +85,14 @@ export const sendMessageU = async (req, res) => {
 
         await newMessage.save();
 
-        //TODO:socket.io for realtime
-
+        const recipientSocketId = getRecieverSocketId(recipientId); // Get the socket ID of the recipient
+   
+        if (recipientSocketId) {      
+            io.to(recipientSocketId).emit("UserMessage", {
+                sender: senderId,
+                message: newMessage
+            }); // Emit the new message to the recipient
+        }
 
         res.status(201).json(newMessage);
     } catch (err) {
@@ -114,10 +122,15 @@ export const sendMessageG = async (req, res) => {
         })
 
         await newMessage.save();
+        
 
-        //TODO:socket.io for realtime
-
-
+        const groupCode = await Group.findById(groupId).select("groupCode").lean(); // Get the group code from the group ID
+        
+        io.to(groupCode.groupCode).emit("GroupMessage", {
+            sender: senderId,
+            message: newMessage
+        }); // Emit the new message to the group
+        
         res.status(201).json(newMessage);
     } catch (err) {
         console.log("Error in sendMessageController: ", err);

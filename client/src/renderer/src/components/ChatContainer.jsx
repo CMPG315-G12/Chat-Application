@@ -9,13 +9,17 @@ import { formatMessageTime } from '../lib/utils';
 import defaultUser from "../assets/default-user.png";
 
 const ChatContainer = () => {
-  const { messages, getMessages, isMessagesLoading, selectedContact, selectedContactType } = useChatStore();
+  const { messages, getMessages, isMessagesLoading, selectedContact, selectedContactType, subscribeToMessages, unsubscribeFromMessages, } = useChatStore();
   const { authUser } = useAuthStore();
   const messageEndRef = useRef(null);
 
   useEffect(() => {
+    if (!selectedContact?._id) return; // If no contact is selected, do nothing
     getMessages(selectedContact._id)
-  }, [selectedContact._id, getMessages]);
+    subscribeToMessages();
+
+    return () => unsubscribeFromMessages();
+  }, [selectedContact._id]); // Fetch messages when selected contact changes
 
   useEffect(() => {
     if (messageEndRef.current && messages) {
@@ -27,10 +31,12 @@ const ChatContainer = () => {
     return (
       <div className='flex-1 flex flex-col overflow-auto'>
         <ChatHeader />
-        <MessageSkeleton />
+        <div className="p-4 space-y-4 overflow-y-auto flex-1">
+          <MessageSkeleton />
+        </div>
         <MessageInput />
       </div>
-    )
+    );
   }
 
   return (
@@ -41,7 +47,6 @@ const ChatContainer = () => {
           <div
             key={message._id}
             className={`chat ${message.senderId === authUser._id ? "chat-end" : "chat-start"}`}
-            ref={messageEndRef}
           >
             <div className=" chat-image avatar">
               <div className="size-10 rounded-full border">
@@ -72,6 +77,7 @@ const ChatContainer = () => {
             </div>
           </div>
         ))}
+        <div ref={messageEndRef} />
       </div>
       <MessageInput />
     </div>

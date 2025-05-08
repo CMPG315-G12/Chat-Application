@@ -9,11 +9,9 @@ import passport from "./lib/lib.passport.js";
 import authRoutes from "./routes/auth.routes.js";
 import messageRoutes from "./routes/message.routes.js";
 import { connectDB } from "./lib/db.js";
+import {app, server} from "./lib/socket_io.js";
 
-
-
-const app = express();
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 5000;
 
 // --Middleware --
 app.use(express.json());
@@ -41,4 +39,4 @@ app.get('/api/data', (req, res) => {
     res.json({ message: 'Hello from server!' });
 });
 
-app.listen(PORT, () => console.log(`server running on port ${PORT}`)); 
+server.listen(PORT, () => console.log(`server running on port ${PORT}`)); 

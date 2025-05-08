@@ -5,9 +5,17 @@ import { useChatStore } from "../store/useChatStore";
 import defaultUser from "../assets/default-user.png";
 
 const ChatHeader = () => {
-  const { selectedContact, setSelectedContact } = useChatStore();
+  const { selectedContact, setSelectedContact, selectedContactType, unsubscribeFromMessages } = useChatStore();
   const { onlineUsers } = useAuthStore();
 
+
+  const handleClose = () => { 
+    if(selectedContactType === "G") {
+      unsubscribeFromMessages(selectedContact._id);
+    }
+    // Reset selected contact and type
+    setSelectedContact(null);
+  }
   return (
     <div className="p-2.5 border-b border-base-300">
       <div className="flex items-center justify-between">
@@ -29,7 +37,7 @@ const ChatHeader = () => {
         </div>
 
         {/* Close button */}
-        <button onClick={() => setSelectedContact(null)}>
+        <button onClick={() => handleClose(null)}>
           <X />
         </button>
       </div>

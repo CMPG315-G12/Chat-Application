@@ -1,9 +1,10 @@
 import { create } from 'zustand';
 import { axiosInstance } from '../lib/axios.js';
 import toast from 'react-hot-toast';
+import { io } from "socket.io-client";
 
 
-export const useAuthStore = create((set) => ({
+export const useAuthStore = create((set, get) => ({
 
     authUser: null,
     authToken: null,
@@ -18,14 +19,18 @@ export const useAuthStore = create((set) => ({
     isProviderSignup: false,
     isProvirderLogin: false,
 
+    socket: null,
+
     checkAuth: async () => {
         try {
-            const res = await axiosInstance.get('/auth/checkAuth'); 
-           set({
+            const res = await axiosInstance.get('/auth/checkAuth');
+            set({
                 authUser: res.data.user,
                 isCheckingAuth: false,
             });
 
+            get().connectSocket(); // Connect to socket after checking auth
+            return { success: true };
         } catch (err) {
             console.log("Error in checkAuth", err);
             if (err.response?.status === 401) {
@@ -47,6 +52,9 @@ export const useAuthStore = create((set) => ({
             });
 
             toast.success("Signup successful!");
+
+            get().connectSocket(); // Connect to socket after sigunup
+
             return { success: true, redirectUrl: res.data.redirectUrl || '/' };
         } catch (err) {
             console.log("Error in signup", err);
@@ -66,6 +74,9 @@ export const useAuthStore = create((set) => ({
             });
 
             toast.success("Login successful!");
+
+            get().connectSocket(); // Connect to socket after login
+
             return { success: true, redirectUrl: res.data.redirectUrl || '/' };
         } catch (err) {
             console.log("Error in login", err);
@@ -80,6 +91,9 @@ export const useAuthStore = create((set) => ({
             const res = await axiosInstance.post('/auth/logout');
             set({ authUser: null, authToken: null });
             toast.success(res.data.message || "Logout successful!");
+
+            get().disconnectSocket(); // Disconnect from socket after logout
+
             return { success: true, redirectUrl: '/login' };
         } catch (err) {
             console.log("Error in logout", err);
@@ -90,14 +104,53 @@ export const useAuthStore = create((set) => ({
 
     providerSignup: async (provider) => {
         return new Promise((resolve) => {
-          // Listen for the event before calling the login
-          window.electron.on('oauth-complete', () => {
-            console.log('OAuth completed');
-            resolve({ success: true, redirectUrl: '/' });
-          });
-      
-          // Trigger the OAuth login process
-          window.electron.invoke('oauth-login', provider);
+            // Listen for the event before calling the login
+            window.electron.on('oauth-complete', () => {
+                console.log('OAuth completed');
+                resolve({ success: true, redirectUrl: '/' });
+            });
+
+            // Trigger the OAuth login process
+            window.electron.invoke('oauth-login', provider);
         });
-      }
+    },
+
+    connectSocket: () => {
+        const { authUser, authToken } = get();
+        if (!authUser || !authToken || get().socket?.connected) return;
+
+        let URL = __API_URL__.replace(/\/api\/?$/, '');
+
+        console.log("Connecting to socket...", URL);
+        const socket = io(URL, {
+            withCredentials: true,
+            transports: ["websocket"], // explicitly use websocket
+            auth: {
+                token: authToken, // send token for handshake if needed
+            },
+            query: {
+                userId: authUser._id, // send userId for handshake if needed
+            },
+        });
+
+        socket.on("connect", () => {
+            console.log("Socket connected:", socket.id);
+        });
+
+        set({ socket: socket });
+
+        socket.on("getOnlineUser", (userIds) => {
+            set({ onlineUsers: userIds });
+        });
+
+        socket.on("join-room", (roomId) => {
+            console.log("Joined room:", roomId);
+            socket.join(roomId);
+        });
+    },
+
+    disconnectSocket: () => {
+        if (get().socket?.connected) get().socket.disconnect(); //disconnects only if a socket is open
+    },
+
 }));
