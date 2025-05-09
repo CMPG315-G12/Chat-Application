@@ -38,6 +38,7 @@ export const useChatStore = create((set, get) => ({
             try {
                 const res = await axiosInstance.get(`/message/u/${contactId}`);
                 set({ messages: res.data });
+                console.log("Messages: ", res.data);
             } catch (err) {
                 toast.error(err.response.data.message || "Error fetching messages");
             } finally {
@@ -109,11 +110,12 @@ export const useChatStore = create((set, get) => ({
 
         } else if (selectedContactType === "U") {
             socket.on("UserMessage", (newMessage) => {
-                const isMessageSentFromSelectedUser = newMessage.senderId === selectedContact._id;
-                if (!isMessageSentFromSelectedUser) return;
+                console.log("New message: ", newMessage);
+                // const isMessageSentFromSelectedUser = newMessage.senderId === selectedContact._id;
+                // if (!isMessageSentFromSelectedUser) return;
 
                 set({
-                    messages: [...get().messages, newMessage],
+                    messages: [...get().messages, newMessage.message],
                 });
             });
         } else {

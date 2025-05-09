@@ -64,8 +64,6 @@ const Sidebar = () => {
           </button>
         ))}
 
-        <hr className="my-4 border-t border-zinc-700" />
-
         {contacts?.groups?.map((group) => (
           <button
             key={group._id}

@@ -59,6 +59,7 @@ export const useAuthStore = create((set, get) => ({
         } catch (err) {
             console.log("Error in signup", err);
             toast.error(err.response.data.message || "Signup failed!");
+            return { success: false };
         } finally {
             set({ isSigningUp: false });
         }
@@ -81,6 +82,7 @@ export const useAuthStore = create((set, get) => ({
         } catch (err) {
             console.log("Error in login", err);
             toast.error(err.response.data.message || "Login failed!");
+            return { success: false };
         } finally {
             set({ isLoggingIn: false });
         }
@@ -98,6 +100,7 @@ export const useAuthStore = create((set, get) => ({
         } catch (err) {
             console.log("Error in logout", err);
             toast.error(err.response.data.message || "Logout failed!");
+            return { success: false };
         }
     },
 

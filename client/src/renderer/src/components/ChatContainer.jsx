@@ -19,7 +19,7 @@ const ChatContainer = () => {
     subscribeToMessages();
 
     return () => unsubscribeFromMessages();
-  }, [selectedContact._id]); // Fetch messages when selected contact changes
+  }, [selectedContact._id, getMessages, subscribeToMessages, unsubscribeFromMessages]); // Fetch messages when selected contact changes
 
   useEffect(() => {
     if (messageEndRef.current && messages) {

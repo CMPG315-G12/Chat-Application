@@ -91,7 +91,8 @@ export const sendMessageU = async (req, res) => {
             io.to(recipientSocketId).emit("UserMessage", {
                 sender: senderId,
                 message: newMessage
-            }); // Emit the new message to the recipient
+            });
+            console.log(`Message sent to ${recipientId} : ${newMessage}`) // Emit the new message to the recipient
         }
 
         res.status(201).json(newMessage);
