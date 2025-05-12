@@ -40,7 +40,7 @@ const App = () => {
         <Route path='/profile' element={authUser ? <ProfilePage /> : <Navigate to="/login" />} />
 
         {/* Catch-all route */}
-        <Route path="*" element={<NotFound />} />
+        <Route path="*" element={!authUser ? <NotFound /> : <Navigate to="/" />} />
       </Routes>
 
       <Toaster />
