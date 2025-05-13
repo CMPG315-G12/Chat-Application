@@ -11,6 +11,7 @@ import { useAuthStore } from './store/useAuthStore.js';
 import { useThemeStore } from './store/useThemeStore.js';
 import { Loader } from "lucide-react";
 import { Toaster } from 'react-hot-toast';
+import ForgotPassword from './components/ForgotPassword.jsx';
 
 const App = () => {
 
@@ -38,6 +39,7 @@ const App = () => {
         <Route path='/login' element={!authUser ? <LogInPage /> : <Navigate to="/" />} />
         <Route path='/settings' element={authUser ? <SettingsPage /> : <Navigate to="/login" />} />
         <Route path='/profile' element={authUser ? <ProfilePage /> : <Navigate to="/login" />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
 
         {/* Catch-all route */}
         <Route path="*" element={!authUser ? <NotFound /> : <Navigate to="/" />} />
