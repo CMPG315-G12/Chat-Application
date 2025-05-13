@@ -3,26 +3,28 @@ import { Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
 const ForgotPassword = () => {
-  const [email, setEmail] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate();
+    const [email, setEmail] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+    const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsLoading(true);
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setIsLoading(true);
 
-    try {
-      //please add API call to send the password reset link
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      toast.success('Password reset link sent to your email!');
-      navigate('/login');
-    } catch (error) {
-      toast.error('Failed to send reset link. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+        try {
+        //Out of scope work, doesnt require backend
+        // Simulate API call to send password reset link
+        await new Promise((resolve) => setTimeout(resolve, 3000));
+
+            // Simulate successful email sending
+        toast.success('Password reset link sent to your email!');
+        navigate('/login');
+        } catch (error) {
+        toast.error('Failed to send reset link. Please try again.');
+        } finally {
+        setIsLoading(false);
+        }
+ };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 to-blue-100 p-4">
